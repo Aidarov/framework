@@ -34,9 +34,13 @@
 
 			$controller = ($controllerName) ? $controllerName : get_class($this);
 
-			$viewPath = 'server_app/view/'.strtolower($controller).'/'.$viewName.'.php';
+			$viewPath = 'server_app/view/'.strtolower($controller).'/'.$viewName.'.php';			
 
 			$view = file_exists($viewPath) ? $viewPath : $defaultView;
+			
+			unset($arguments);
+			unset($defaultView);
+			unset($controller);
 
 			include_once($view);
 		}

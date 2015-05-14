@@ -7,7 +7,7 @@
 
 		protected $tablePk = 'id';
 
-		protected $params = [];
+		protected $params = array();
 		/**
 		  * params consists of database fields
 		  * each array says:
@@ -180,7 +180,7 @@
 		}
 
 		protected function validate() {
-			$paramDuplicate = [];
+			$paramDuplicate = array();
 			foreach($this->params as $value) {
 				$value['fieldValue'] = $this->$value['fieldName'];
 				array_push($paramDuplicate, $value);

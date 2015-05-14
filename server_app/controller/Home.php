@@ -6,6 +6,6 @@
 		}
 
 		function index() {
-			$this->view('index', array('bula'=>'temirov2'));
+			$this->view('index', array('controller'=>'home'));
 		}
 	}
