@@ -1,5 +1,5 @@
 <?php
-	class Config {
+	class Main {
 
 		public static $params = array(
 			'baseUrl' => 'localhost/sport',
@@ -20,7 +20,7 @@
 					'dbname' => 'dbname'
 				),
 			'langs' => array(
-					'all' => ['KAZ', 'RUS', 'ENG'],
+					'all' => array('KAZ', 'RUS', 'ENG'),
 					'default' => 'KAZ'
 				)
 		);
