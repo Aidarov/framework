@@ -22,7 +22,7 @@
 
 			$this->get = ($_GET) ? $_GET : null;
 
-			$this->config = Config::$params;
+			$this->config = MainConfig::$params;
 
 		}
 
@@ -30,7 +30,7 @@
 
 			($arguments) ? extract($arguments) : $arguments;
 			
-			$defaultView =  Config::$params['defaultView'].'.php';
+			$defaultView =  $this->config['defaultView'].'.php';
 
 			$controller = ($controllerName) ? $controllerName : get_class($this);
 

@@ -1,5 +1,5 @@
 <?php
-	class Main {
+	class MainConfig {
 
 		public static $params = array(
 			'baseUrl' => 'localhost/sport',

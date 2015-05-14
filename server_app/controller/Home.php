@@ -6,6 +6,6 @@
 		}
 
 		function index() {
-			$this->view('index');
+			$this->view('index', array('bula'=>'temirov2'));
 		}
 	}

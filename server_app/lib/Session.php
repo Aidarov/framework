@@ -14,7 +14,7 @@
 		}
 
 		public function startSession($lifetime = null) {
-			$lifetime = ($lifetime) ? $lifetime : Config::$params['session']['lifeTimeMin'];			
+			$lifetime = ($lifetime) ? $lifetime : MainConfig::$params['session']['lifeTimeMin'];			
 			session_set_cookie_params($lifetime,"/");
 			session_start();
 		}

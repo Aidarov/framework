@@ -1,7 +1,7 @@
 <?php
 	class Route {
 		private $url;
-		private $urlArray = [];
+		private $urlArray = array();
 		private $controllerName;
 		private $actionName;
 		private $queryParams;

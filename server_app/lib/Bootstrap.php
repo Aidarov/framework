@@ -7,17 +7,17 @@
 
 			$route = new Route();
 
-			$this->config = Config::$params;
+			$this->config = MainConfig::$params;
 
 			$controllerName = $route->getControllerName();			
 
-			$controller = file_exists(Config::$params['controllerUrl'].'/'.$controllerName.'.php') ? ucfirst(strtolower($controllerName)) : Config::$params['defaultController'];
+			$controller = file_exists(MainConfig::$params['controllerUrl'].'/'.$controllerName.'.php') ? ucfirst(strtolower($controllerName)) : MainConfig::$params['defaultController'];
 
-			include_once(Config::$params['controllerUrl'].'/'.$controller.'.php');
+			include_once(MainConfig::$params['controllerUrl'].'/'.$controller.'.php');
 			
 			$this->controller = new $controller;
 
-			$action = ($route->getActionName()) ? $route->getActionName() : Config::$params['defaultAction'];			
+			$action = ($route->getActionName()) ? $route->getActionName() : MainConfig::$params['defaultAction'];			
 
 			method_exists($this->controller, $action) ? $this->controller->{$action}() : $this->controller->view('method_not_found', null, 'error');
 			
