@@ -22,6 +22,9 @@
 			'langs' => array(
 					'all' => array('KAZ', 'RUS', 'ENG'),
 					'default' => 'KAZ'
-				)
+				),
+			'errors' => array(
+				''
+			)
 		);
 	}

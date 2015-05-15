@@ -182,7 +182,7 @@
 		protected function validate() {
 			$paramDuplicate = array();
 			foreach($this->params as $value) {
-				$value['fieldValue'] = $this->$value['fieldName'];
+				$value['fieldValue'] = $this->{$value['fieldName']};
 				array_push($paramDuplicate, $value);
 			}
 
