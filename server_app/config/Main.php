@@ -16,8 +16,8 @@
 			'database' => array(
 					'servername' => 'localhost',
 					'username' => 'root',
-					'password' => 'password',
-					'dbname' => 'dbname'
+					'password' => 'orapas',
+					'dbname' => 'test'
 				),
 			'langs' => array(
 					'all' => array('KAZ', 'RUS', 'ENG'),

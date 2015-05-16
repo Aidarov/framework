@@ -55,15 +55,17 @@
 				  'minValue'=>'0')
 		]*/
 
-		private $servername = 'localhost';
+		private $servername;
 
-		private $username = 'root';
+		private $username;
 
-		private $password = '';
+		private $password;
 
-		private $dbname = 'test';
-
-		//private $valid = true;
+		private $dbname;
+		
+		private $validation;		
+		
+		
 
 		/*
 		 *Join unit
@@ -80,26 +82,30 @@
 
 		function __construct() {
 			try {
+			
+				$this->servername = MainConfig::$params['database']['servername'];
+				$this->username = MainConfig::$params['database']['username'];
+				$this->password = MainConfig::$params['database']['password'];
+				$this->dbname = MainConfig::$params['database']['dbname'];				
+
 				$this->connection = new PDO("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password);			    
 			    $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);			    
 			}
 			catch(PDOException $e) {
 			    echo "errm: " . $e->getMessage();
-			}			
-
-			if(sizeof($this->params) > 0) {
-				$this->validate();				
 			}
 		}
 
-		public function selectByPk($id) {
-			$result = $this->selectExecute("SELECT * FROM $this->tableName WHERE $this->tablePk = $id");
+		public function selectByPk($id) {			
+			$statement = $this->connection->prepare("SELECT * FROM $this->tableName WHERE $this->tablePk = :id");
+			$statement->execute(array('id' => $id));
+			$result = $statement->fetchAll();
 			return $result;			
 		}
 
 		public function deleteByPk($id) {			
-			$statement = $this->connection->prepare("DELETE FROM $this->tableName WHERE $this->tablePk = $id");
-			$statement->execute();
+			$statement = $this->connection->prepare("DELETE FROM $this->tableName WHERE $this->tablePk = :id");
+			$statement->execute(array('id' => $id));
 			return ($statement) ? true : false;
 		}
 
@@ -109,17 +115,18 @@
 			$tail = (sizeof($params) > 1) ? ', ' : '   ';
 
 			foreach ($params as $key => $value) {
-				$update_str .= $key.' = "'.$value.'"'.$tail;
+				$update_str .= $key.' = "'.mysql_real_escape_string($value).'"'.$tail;
 			}
 
 			$update_str = substr($update_str, 0, -2);
 			
-			$statement = $this->connection->prepare("UPDATE $this->tableName SET $update_str WHERE $this->tablePk = $id");
+			$statement = $this->connection->prepare("UPDATE $this->tableName SET $update_str WHERE $this->tablePk = :id");
 
-			$statement->execute();
+			$statement->execute(array('id' => $id));
 
 			return ($statement) ? true : false;
 		}
+		
 
 		public function insert($tableData) {
 			$insert_columns = '';
@@ -127,7 +134,7 @@
 
 			foreach ($tableData as $key => $value) {				
 				$insert_columns .= $key.', ';
-				$insert_values .= '"'.$value.'", ';				
+				$insert_values .= '"'.mysql_real_escape_string($value).'", ';				
 			}
 
 			$insert_columns = substr($insert_columns, 0, -2);
@@ -180,36 +187,44 @@
 		}
 
 		protected function validate() {
+		
 			$paramDuplicate = array();
+			
 			foreach($this->params as $value) {
 				$value['fieldValue'] = $this->{$value['fieldName']};
 				array_push($paramDuplicate, $value);
 			}
 
+			$this->validation = new Validation($paramDuplicate);
 
-			$validation = new Validation($paramDuplicate);
-
-			$validation->checkType();
-			$validation->isEmpty();
-			$validation->checkMinValue();
-			$validation->checkMaxValue();
-			$validation->checkMinLength();
-			$validation->checkRegular();
-
-			( sizeof($validation->getErrorMessage() > 0 ) ? $this->_break($errors) : $this->_continue);
+			$this->validation->checkType();
+			$this->validation->isEmpty();
+			$this->validation->checkMinValue();
+			$this->validation->checkMaxValue();
+			$this->validation->checkMinLength();
+			$this->validation->checkRegular();
+			
+			return (sizeof($this->validation->getErrorMessage()) > 0 ) ? false : true ;
 		}
-
-		private function _break($errors) {
-			print_r($errors);
-			exit;
+		
+		protected function save() {
+		
+			if($this->validate()) {
+				$modelObjects = array();
+				
+				foreach($this->params as $value) {				
+					$modelObjects[$value['fieldName']] = $this->{$value['fieldName']};
+				}
+				
+				return $this->getPdoErrorMessage();			
+			}
+			else {
+				return $this->validation->getErrorMessage();
+			}			
+		}		
+		
+		public function getPdoErrorMessage() {
+			return $this->connection->errorInfo();
 		}
-
-		private function _continue() {
-			print "Everything is ok";
-			continue;
-		}
-
-
-	}
-
-	      
+		
+	}      
