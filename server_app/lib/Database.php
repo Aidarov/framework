@@ -3,9 +3,9 @@
 
 		private $connection;
 
-		protected $tableName = 'demo';
+		protected $tableName;
 
-		protected $tablePk = 'id';
+		protected $tablePk;
 
 		protected $params = array();
 		/**
@@ -138,7 +138,7 @@
 			}
 
 			$insert_columns = substr($insert_columns, 0, -2);
-			$insert_values = substr($insert_values, 0, -2);
+			$insert_values = substr($insert_values, 0, -2);		
 			
 			$statement = $this->connection->prepare("INSERT INTO $this->tableName($insert_columns) VALUES($insert_values)");
 
@@ -186,7 +186,7 @@
 			return $result;
 		}
 
-		protected function validate() {
+		public function validate() {
 		
 			$paramDuplicate = array();
 			
@@ -202,25 +202,25 @@
 			$this->validation->checkMinValue();
 			$this->validation->checkMaxValue();
 			$this->validation->checkMinLength();
-			$this->validation->checkRegular();
+			$this->validation->checkMaxLength();
+			$this->validation->checkForRegExp();
 			
-			return (sizeof($this->validation->getErrorMessage()) > 0 ) ? false : true ;
+			return (sizeof($this->validation->getErrorCode()) > 0 ) ? false : true ;
 		}
 		
-		protected function save() {
+		public function getValidationErrors() {
+			return $this->validation->getErrorCode();
+		}
 		
-			if($this->validate()) {
-				$modelObjects = array();
-				
-				foreach($this->params as $value) {				
-					$modelObjects[$value['fieldName']] = $this->{$value['fieldName']};
-				}
-				
-				return $this->getPdoErrorMessage();			
-			}
-			else {
-				return $this->validation->getErrorMessage();
+		public function save() {
+			$modelObjects = array();
+			foreach($this->params as $value) {
+				$modelObjects[$value['fieldName']] = $this->{$value['fieldName']};					
 			}			
+			$this->insert($modelObjects);
+			
+			return $this->getPdoErrorMessage();
+			
 		}		
 		
 		public function getPdoErrorMessage() {

@@ -1,2 +1,2 @@
 <?php
-	echo $controller;
+	echo $controlle;

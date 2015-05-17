@@ -15,7 +15,9 @@
 			//action
 			$this->actionName = (sizeof($this->urlArray) > 1) ? $this->urlArray[1] : null;
 			//queryParams
-			$this->queryParams = (sizeof($this->urlArray) > 2) ? implode('/', array_slice($this->urlArray, 2, (sizeof($this->urlArray)) - 2)) : null;			
+			$this->queryParams = $_GET;
+			unset($this->queryParams['url']);			
+			//$this->queryParams = (sizeof($this->urlArray) > 2) ? implode('/', array_slice($this->urlArray, 2, (sizeof($this->urlArray)) - 2)) : null;			
 		}
 
 		public function getUrl() {

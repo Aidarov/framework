@@ -1,28 +1,34 @@
 <?php
 	class Validation {
-		private $params;
+		private $params = array();
 
 		private $result;
 
 		function __construct($paramDuplicate) {
-			$this->params = $paramDuplicate;
+			print_r($this->err);
+			$this->params = $paramDuplicate;		
 		}
 
 		private $errorMessage = array();
 
-		private function setErrorCode($error) {			
-			array_push($this->errorMessage, $error)
+		private function setErrorCode($errorName, $errorMessage) {
+			if(array_key_exists($errorName, $this->errorMessage)) {
+				array_push($this->errorMessage[$errorName], $errorMessage);
+			}
+			else {				
+				$this->errorMessage[$errorName] = array();
+				array_push($this->errorMessage[$errorName], $errorMessage);
+			}			
 		}
 
-		public function getErrorMessage() {
+		public function getErrorCode() {			
 			return $this->errorMessage;
 		}
 
-
 		public function isEmpty() {
 			foreach ($this->params as $value) {
-				if((!$value['isEmpty']) && (is_null($value['fieldValue']) || (trim($value['fieldValue']) === ""))) {
-					array_push($this->errorMessage[$value['fieldName']], 'empty_value');					
+				if((!$value['isEmpty']) && (is_null($value['fieldValue']) || (trim($value['fieldValue']) === ""))) {					
+					$this->setErrorCode($value['fieldName'], 'empty_value');
 				}
 			}
 		}
@@ -32,24 +38,21 @@
 				switch(strtolower($value['dataType'])) {
 					case 'date':
 					case 'string':
-						if(!is_string($value['fieldValue']) && !is_null($value['fieldValue'])) {
-							array_push($this->errorMessage[$value['fieldName']], 'incompatible_type');
+						if(!is_string($value['fieldValue']) && !is_null($value['fieldValue'])) {							
+							$this->setErrorCode($value['fieldName'], 'incompatible_type');
 						}
 						break;
 					case 'timestamp':
 					case 'integer':
-						if(!is_int($value['fieldValue']) && !is_null($value['fieldValue'])) {
-							array_push($this->errorMessage[$value['fieldName']], 'incompatible_type');
+						if(!is_int($value['fieldValue']) && !is_null($value['fieldValue'])) {							
+							$this->setErrorCode($value['fieldName'], 'incompatible_type');
 						}
 						break;
 					case 'double':
-						if(!is_double($value['fieldValue']) && !is_null($value['fieldValue'])) {
-							array_push($this->errorMessage[$value['fieldName']], 'incompatible_type');
+						if(!is_double($value['fieldValue']) && !is_null($value['fieldValue'])) {							
+							$this->setErrorCode($value['fieldName'], 'incompatible_type');
 						}
 						break;
-					default:
-						array_push($this->errorMessage[$value['fieldName']], 'undefined_type');
-						break;						
 				}
 			}
 		}
@@ -68,21 +71,20 @@
 				switch(strtolower($value['dataType'])) {
 					case 'date':
 						if($value['minValue']) {
-							if(strtotime($value['fieldValue']) < strtotime($value['minValue'])) {
-								array_push($this->errorMessage[$value['fieldName']], 'requires_bigger_value');
+							if(strtotime($value['fieldValue']) < strtotime($value['minValue'])) {								
+								$this->setErrorCode($value['fieldName'], 'requires_bigger_value');
 							}
 						}
 						break;
 					case 'timestamp':
 					case 'integer':
 					case 'double':
-						if($value['fieldValue'] < $value['minValue']) {
-							array_push($this->errorMessage[$value['fieldName']], 'requires_bigger_value');
+						if($value['minValue']) {
+							if($value['fieldValue'] < $value['minValue']) {								
+								$this->setErrorCode($value['fieldName'], 'requires_bigger_value');
+							}
 						}
-						break;
-					default:
-						array_push($this->errorMessage[$value['fieldName']], 'undefined_value');
-						break;						
+						break;			
 				}
 			}
 		}
@@ -99,23 +101,18 @@
 		public function checkMaxValue() {
 			foreach ($this->params as $value) {
 				switch(strtolower($value['dataType'])) {
-					case 'date':
-						if($value['minValue']) {
-							if(strtotime($value['fieldValue']) > strtotime($value['maxValue'])) {
-								array_push($this->errorMessage[$value['fieldName']], 'requires_smaller_value');
-							}
-						}
+					case 'date':						
+						if(!is_null($value['maxValue']) && (strtotime($value['fieldValue']) > strtotime($value['maxValue']))) {							
+							$this->setErrorCode($value['fieldName'], 'requires_smaller_value');
+						}						
 						break;
 					case 'timestamp':
 					case 'integer':
 					case 'double':
-						if($value['fieldValue'] > $value['maxValue']) {
-							array_push($this->errorMessage[$value['fieldName']], 'requires_smaller_value');
+						if(!is_null($value['maxValue']) && ($value['fieldValue'] > $value['maxValue'])) {							
+							$this->setErrorCode($value['fieldName'], 'requires_smaller_value');
 						}
-						break;
-					default:
-						array_push($this->errorMessage[$value['fieldName']], 'undefined_value');
-						break;						
+						break;			
 				}
 			}
 		}
@@ -130,18 +127,15 @@
 		*
 		*/
 		public function checkMinLength() {
-			foreach ($this->params as $value) {
+			foreach ($this->params as $value) {				
 				switch(strtolower($value['dataType'])) {
-					case 'string':
-						if($value['minValue']) {
-							if(strtotime($value['fieldValue']) > strtotime($value['minValue'])) {
-								array_push($this->errorMessage[$value['fieldName']], 'requires_smaller_length');
+					case 'string':						
+						if($value['minLength']) {
+							if(strlen($value['fieldValue']) < $value['minLength']) {								
+								$this->setErrorCode($value['fieldName'], 'requires_bigger_length');
 							}
 						}
-						break;
-					default:
-						array_push($this->errorMessage[$value['fieldName']], 'undefined_min_length');
-						break;						
+						break;			
 				}
 			}
 		}
@@ -159,16 +153,13 @@
 		public function checkMaxLength() {
 			foreach ($this->params as $value) {
 				switch(strtolower($value['dataType'])) {
-					case 'string':
-						if($value['maxValue']) {
-							if(strtotime($value['fieldValue']) < strtotime($value['minValue'])) {
-								array_push($this->errorMessage[$value['fieldName']], 'requires_bigger_length');
+					case 'string':						
+						if($value['maxLength']) {
+							if(strlen($value['fieldValue']) > $value['maxLength']) {								
+								$this->setErrorCode($value['fieldName'], 'requires_smaller_length');
 							}
 						}
-						break;
-					default:
-						array_push($this->errorMessage[$value['fieldName']], 'undefined_max_length');
-						break;						
+						break;		
 				}
 			}
 		}
@@ -184,8 +175,10 @@
 		*
 		*/
 		public function checkForRegExp() {
-			if(!preg_match($value['regular'], $value['fieldValue'])) {
-				array_push($this->errorMessage[$value['fieldName']], 'no_passed_from_regex');
+			foreach ($this->params as $value) {
+				if(!is_null($value['regular']) && !@preg_match($value['regular'], $value['fieldValue'])) {					
+					$this->setErrorCode($value['fieldName'], 'no_passed_from_regex');
+				}
 			}
 		}
 		

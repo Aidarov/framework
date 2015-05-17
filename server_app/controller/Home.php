@@ -1,11 +1,27 @@
 <?php
 	class Home extends Controller{
+	
 		function __construct() {
-			//parent::__construct();
-			print_r($this->config);
+			/**
+			*
+			* always call parent controller constructor
+			*/
+			parent::__construct();			
 		}
 
 		function index() {
-			$this->view('index', array('controller'=>'home'));
+			$authModel = new Auth();
+			
+			$authModel->code ='kunya1';
+			$authModel->descr = 'description';
+			if($authModel->validate()) {
+				$authModel->save();			
+			} else {
+				print_r($authModel->getValidationErrors());
+			}
+			
+			
+			
+			$this->view('index', array('controlle'=>'home'));
 		}
 	}

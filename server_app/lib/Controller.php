@@ -20,9 +20,11 @@
 			
 			$this->post = ($_POST) ? $_POST : null;
 
-			$this->get = ($_GET) ? $_GET : null;
+			$this->get = ($_GET) ? $route->getQueryParams() : null;
 
 			$this->config = MainConfig::$params;
+			
+			$this->includeModels();
 
 		}
 
@@ -43,5 +45,11 @@
 			unset($controller);
 
 			include_once($view);
+		}
+		
+		private function includeModels() {
+			foreach (glob('server_app/model'.'/*.*') as $filename) {				
+				include_once($filename);				
+			}
 		}
 	}
