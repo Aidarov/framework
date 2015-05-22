@@ -106,7 +106,7 @@
 		public function deleteByPk($id) {			
 			$statement = $this->connection->prepare("DELETE FROM $this->tableName WHERE $this->tablePk = :id");
 			$statement->execute(array('id' => $id));
-			return ($statement) ? true : false;
+			return ($statement->rowCount() > 0) ? true : false;
 		}
 
 		public function updateByPk($id, $params) {
@@ -124,7 +124,7 @@
 
 			$statement->execute(array('id' => $id));
 
-			return ($statement) ? true : false;
+			return ($statement->rowCount() > 0) ? true : false;
 		}
 		
 

@@ -10,7 +10,7 @@
 		}
 
 		function index() {
-			$authModel = new Auth();
+			/*$authModel = new Auth();
 			
 			$authModel->code ='kunya1';
 			$authModel->descr = 'description';
@@ -22,6 +22,6 @@
 			
 			
 			
-			$this->view('index', array('controlle'=>'home'));
+			$this->view('index', array('controlle'=>'home'));*/
 		}
 	}

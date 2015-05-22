@@ -4,8 +4,7 @@
 
 		private $result;
 
-		function __construct($paramDuplicate) {
-			print_r($this->err);
+		function __construct($paramDuplicate) {			
 			$this->params = $paramDuplicate;		
 		}
 
@@ -176,9 +175,13 @@
 		*/
 		public function checkForRegExp() {
 			foreach ($this->params as $value) {
-				if(!is_null($value['regular']) && !@preg_match($value['regular'], $value['fieldValue'])) {					
-					$this->setErrorCode($value['fieldName'], 'no_passed_from_regex');
-				}
+				switch(strtolower($value['dataType'])) {
+					case 'string':						
+						if(!is_null($value['regular']) && !@preg_match($value['regular'], $value['fieldValue'])) {					
+							$this->setErrorCode($value['fieldName'], 'no_passed_from_regex');
+						}
+					break;		
+				}				
 			}
 		}
 		
