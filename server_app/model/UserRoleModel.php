@@ -25,7 +25,7 @@
 				  'dataType'=>'string',
 				  'isEmpty'=>false,				  
 				  'maxLength'=>20,
-				  'minLength'=>null,
+				  'minLength'=>0,
 				  'regular'=>null,
 				  'fieldValue'=>''),
 			array('fieldName'=>'description',

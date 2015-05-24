@@ -59,7 +59,7 @@
 
 		private $username;
 
-		private $password;
+		private $password_db;
 
 		private $dbname;
 		
@@ -85,10 +85,10 @@
 			
 				$this->servername = MainConfig::$params['database']['servername'];
 				$this->username = MainConfig::$params['database']['username'];
-				$this->password = MainConfig::$params['database']['password'];
+				$this->password_db = MainConfig::$params['database']['password'];
 				$this->dbname = MainConfig::$params['database']['dbname'];				
 
-				$this->connection = new PDO("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password);			    
+				$this->connection = new PDO("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password_db);			    
 			    $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);			    
 			}
 			catch(PDOException $e) {

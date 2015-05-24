@@ -51,6 +51,10 @@
 						if(!is_double($value['fieldValue']) && !is_null($value['fieldValue'])) {							
 							$this->setErrorCode($value['fieldName'], 'incompatible_type');
 						}
+					case 'json':
+						if (!is_object(json_decode($value['fieldValue']))) {
+							$this->setErrorCode($value['fieldName'], 'incompatible_type');
+						}
 						break;
 				}
 			}
