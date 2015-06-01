@@ -8,4 +8,3 @@
 	include_once('server_app/lib/Controller.php');
 	include_once('server_app/lib/Bootstrap.php');
 	$boot = new Bootstrap();
-	

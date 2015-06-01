@@ -188,6 +188,14 @@
 				}				
 			}
 		}
+
+		public function isEqualTwoPassword() {			
+			foreach ($this->params as $value) {
+				if(!is_null($value['confirm']) && ($value['confirm'] !== "") && ($value['fieldValue'] !== $value['confirm'])) {
+					$this->setErrorCode($value['fieldName'], 'password_not_match');					
+				}
+			}
+		}
 		
 
 	}

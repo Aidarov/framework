@@ -45,7 +45,8 @@
 				  'maxLength'=>255,
 				  'minLength'=>1,
 				  'regular'=>'',
-				  'fieldValue'=>''),
+				  'fieldValue'=>'',
+				  'confirm'=>'password'),
 			array('fieldName' => 'id_child_tbl',
 				  'isPk'=>false,
 				  'isFk'=>array('tableName'=>'tbl2', 'columnName'=>'col2'),
@@ -204,6 +205,7 @@
 			$this->validation->checkMinLength();
 			$this->validation->checkMaxLength();
 			$this->validation->checkForRegExp();
+			$this->validation->isEqualTwoPassword();
 			
 			return (sizeof($this->validation->getErrorCode()) > 0 ) ? false : true ;
 		}
@@ -225,6 +227,14 @@
 		
 		public function getPdoErrorMessage() {
 			return $this->connection->errorInfo();
+		}
+
+		public function setPasswordVerify($fieldName, $fieldPassword) {
+			foreach ($this->params as $value) {
+				if($value['fieldName'] === $fieldName) {
+					$value['confirm'] = $fieldPassword; 
+				}
+			}
 		}
 		
 	}      
