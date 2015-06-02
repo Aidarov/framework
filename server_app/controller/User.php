@@ -1,13 +1,15 @@
 <?php
 	class User extends Controller{
 
-		private $model;
+		private $model;	
 	
 		public function __construct() {
 			/**
 			*
 			* always call parent controller constructor
 			*/
+			$this->userAccessRoleList = array('super_user');
+			
 			parent::__construct();	
 			$this->model = new UserModel();
 		}
@@ -35,15 +37,7 @@
 			$registration_date 	= date("Y-m-d H:i:s", time());
 			$confirm_hash 		= hash('sha256', $this->post['email'].time());
 			$session_hash 		= hash('sha256', $this->post['email'].time());
-			$ip_address			= null;
-
-			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			    $ip_address = $_SERVER['HTTP_CLIENT_IP'];
-			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			    $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-			} else {
-			    $ip_address = $_SERVER['REMOTE_ADDR'];
-			}
+			$ip_address			= $this->getUserIp();
 			
 
 			$this->model->email 			= $email;
@@ -87,57 +81,56 @@
 		}
 
 		public function delete() {
-			echo 'delete';
-		}
-		
-		public function isLoggedIn() {
-			
+			$id = $this->post['id'];
+			$result = $this->deleteByPk($id);			
 		}
 		
 		public function login() {
 		
-			$this->session->startSession();
+			if($this->session->getSessionId()) {
+				$this->session->startSession();			
+			}
 			
 			$email = $this->post['email'];
 			$password = hash('sha256', $this->post['password']);
 			$offset = $this->get['offset'];
 			$session_hash = $this->session->getSessionId();			
-			$passwordExpireTime = ($this->get['savePassword'] === '1') ? $this->config['session']['lifeTimeMax'] : $this->config['session']['lifeTimeMin'];
-			
-			$ip_address = '';
-			
-			
-			
-			
-			
-			/*$result = $this->model->selectWithClause(
-						array('id', 'email'), 
-						array('email' => 'sabit91@mail.ru',
-							  'password' => 'e8358c9cf215cf24afbaacb0408f7cfefa2989f48c2bf654e990470e6d9a3178'),
-						$offset = 0,
-						array(),
-						'ASC'
-					);*/
+			$passwordExpireTime = ($this->get['savePassword'] === '1') ? $this->config['session']['lifeTimeMax'] : $this->config['session']['lifeTimeMin'];			
+			$ip_address = $this->getUserIp();
 			
 			$result = $this->model->updateByClause(
-					array(
-						'session_hash' 		=> $session_hash,
-						'ip_address' 		=> $ip_address,
-						'login_expire_time'	=> date("Y-m-d H:i:s", strtotime("+$passwordExpireTime seconds"))
-					),
-					array(
-						'email' => $email,
-						'password' => $password
-					)
-				);
+						array(
+							'session_hash' 		=> $session_hash,
+							'ip_address' 		=> $ip_address,
+							'login_expire_time'	=> date("Y-m-d H:i:s", strtotime("+$passwordExpireTime seconds"))
+						),
+						array(
+							'email' => $email,
+							'password' => $password
+						)
+					);
+				
+			$this->session->setSessionValue('email', $email);
 		}		
 		
 		public function logout() {
 		
-			$id = $this->post['id'];
-			$result = $this->deleteByPk($id);			
-		}
-
-		
+			$email = $this->session->getSessionValue('email');			
+			$session_hash = $this->session->getSessionId();			
+			
+			
+			$result = $this->model->updateByClause(
+						array(							
+							'login_expire_time'	=> date("Y-m-d H:i:s", strtotime("-1 seconds"))
+						),
+						array(
+							'email' => $email,
+							'login_expire_time' => $session_hash
+						)
+					);
+				
+			$this->session->deleteSessionValue('email');
+			$this->session->stopSession();
+		}		
 		
 	}

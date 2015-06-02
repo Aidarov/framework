@@ -19,14 +19,12 @@
 			session_start();
 		}
 
-		public function setSessionValue($key, $value, $lifetime = null) {
-			if($this->getSessionId()) {
-				$_SESSION[$key] = $value;				
-			}
-			else {
-				$this->startSession($lifetime);
-				$_SESSION[$key] = $value;
-			}
+		public function setSessionValue($key, $value) {			
+			$_SESSION[$key] = $value;			
+		}
+		
+		public function getSessionValue($key) {
+			return $_SESSION[$key];
 		}
 
 		public function deleteSessionValue($key) {

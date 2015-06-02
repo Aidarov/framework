@@ -11,6 +11,8 @@
 		protected $session;
 		protected $post;
 		protected $get;
+		protected $userInfo;
+		
 
 		function __construct() {
 
@@ -25,6 +27,11 @@
 			$this->config = MainConfig::$params;
 			
 			$this->includeModels();
+			
+			$this->identifyUser();
+			
+			print_r($this->userAccessRoleList);
+			
 
 		}
 
@@ -51,5 +58,56 @@
 			foreach (glob('server_app/model'.'/*.*') as $filename) {				
 				include_once($filename);				
 			}
+		}
+		
+		private function checkAccess() {
+			
+			
+		}
+		
+		private function identifyUser() {
+			$model = new UserModel();
+			$now =  date("Y-m-d H:i:s", time());
+			$result = $model->selectWithClause(
+						array('id', 'email', 'login_expire_time', 'user_role_code'), 
+						array('email' => $this->session->getSessionValue('email'),
+							  'session_hash' => $this->session->getSessionId()),
+						$offset = 0,
+						array(),
+						'ASC',
+						'AND login_expire_time >= now()'
+					);
+					
+			$this->userInfo = (sizeof($result) === 1) ? $result[0] : array();
+		}
+		
+		public function getUserRole() {
+			return $this->userInfo['user_role_code'];			
+		}
+		
+		public function getUserEmail() {
+			return $this->userInfo['email'];
+		}
+		
+		public function getUserId() {
+			return $this->userInfo['id'];
+		}
+		
+		public function getUserExpireTime() {
+			return $this->userInfo['login_expire_time'];
+		}
+		
+		public function getUserIp() {
+			$ip_address = '';
+			
+			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			    $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			    $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			} else {
+			    $ip_address = $_SERVER['REMOTE_ADDR'];
+			}
+			
+			return $ip_address;
 		}
 	}

@@ -270,7 +270,7 @@
 			}
 		}
 		
-		public function selectWithClause($columnName, $whereClause, $offset, $orderParam, $orderAscDesc) {
+		public function selectWithClause($columnName, $whereClause, $offset, $orderParam, $orderAscDesc, $customWhereClause = null) {
 		
 			$columns 		= '';
 			$whereCondition = '';
@@ -297,6 +297,7 @@
 					$whereCondition = 'WHERE '.substr($whereCondition, 0, -4);
 				}
 				
+				
 				if(sizeof($orderParam) > 0) {
 				
 					foreach($orderParam as $param) {
@@ -310,7 +311,7 @@
 				
 				$limitClause = 'LIMIT '.$offset.', '.$this->limit;			
 				
-				$result = $this->selectExecute("SELECT $columns FROM $this->tableName $whereCondition $limitClause");
+				$result = $this->selectExecute("SELECT $columns FROM $this->tableName $whereCondition $customWhereClause $limitClause");
 				
 				return $result;
 			}
