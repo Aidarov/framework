@@ -5,7 +5,9 @@
 
 		protected $tableName;
 
-		protected $tablePk;
+		protected $tablePk;	
+		
+		protected $limit = 10;
 
 		protected $params = array();
 		/**
@@ -127,6 +129,37 @@
 			return ($statement->rowCount() > 0) ? true : false;
 		}
 		
+		public function updateByClause($params, $whereClause, $tableName = null) {
+			$update_str = '';
+			$whereCondition = '';
+			$tableName = is_null($tableName) ? $this->tableName : $tableName;
+
+			$tail = (sizeof($params) > 1) ? ', ' : '   ';
+
+			foreach ($params as $key => $value) {
+				$update_str .= $key.' = "'.mysql_real_escape_string($value).'"'.$tail;
+			}
+			
+			if(sizeof($whereClause) > 0) {
+				
+				foreach($whereClause as $key => $value) {
+					$whereCondition .= ' '.mysql_real_escape_string($key).' = "'.mysql_real_escape_string($value).'" AND ';
+				}
+				
+				$whereCondition = 'WHERE '.substr($whereCondition, 0, -4);
+			}
+
+			$update_str = substr($update_str, 0, -2);
+			
+			echo "UPDATE $tableName SET $update_str $whereCondition";
+			
+			$statement = $this->connection->prepare("UPDATE $tableName SET $update_str $whereCondition");
+
+			$statement->execute();
+
+			return ($statement->rowCount() > 0) ? true : false;
+		}
+		
 
 		public function insert($tableData) {
 			$insert_columns = '';
@@ -227,4 +260,52 @@
 			return $this->connection->errorInfo();
 		}
 		
+		public function selectWithClause($columnName, $whereClause, $offset, $orderParam, $orderAscDesc) {
+		
+			$columns 		= '';
+			$whereCondition = '';
+			$orderByClause 	= '';
+			$limitClause;
+			
+			if(is_array($columnName) && is_array($whereClause) && is_int($offset) && !is_null($offset) && is_array($orderParam) && ($orderAscDesc === 'ASC' || $orderAscDesc === 'DESC')) {
+			
+				if(sizeof($columnName) > 0) {					
+					
+					foreach($columnName as $column) {
+						$columns .= ' '.$column.', ';
+					}
+					
+					$columns = substr($columns, 0, -2);
+				}
+				
+				if(sizeof($whereClause) > 0) {
+				
+					foreach($whereClause as $key => $value) {
+						$whereCondition .= ' '.mysql_real_escape_string($key).' = "'.mysql_real_escape_string($value).'" AND ';
+					}
+					
+					$whereCondition = 'WHERE '.substr($whereCondition, 0, -4);
+				}
+				
+				if(sizeof($orderParam) > 0) {
+				
+					foreach($orderParam as $param) {
+						$orderByClause .=  $param.', ';
+					}
+					
+					$orderByClause = substr($orderByClause, 0, -2);
+					
+					$orderByClause = 'ORDER BY '.$orderByClause.' '.$orderAscDesc;
+				}
+				
+				$limitClause = 'LIMIT '.$offset.', '.$this->limit;			
+				
+				$result = $this->selectExecute("SELECT $columns FROM $this->tableName $whereCondition $limitClause");
+				
+				return $result;
+			}
+			else {
+				return null;
+			}
+		}
 	}      

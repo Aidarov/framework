@@ -3,7 +3,7 @@
 
 		private $model;
 	
-		function __construct() {
+		public function __construct() {
 			/**
 			*
 			* always call parent controller constructor
@@ -12,11 +12,11 @@
 			$this->model = new UserModel();
 		}
 
-		function index() {
+		public function index() {
 			echo 'index';
 		}
 
-		function insert() {			
+		public function insert() {			
 			$this->model->email = 'sabit91@mail.ru';
 			$this->model->password = 'e8358c9cf215cf24afbaacb0408f7cfefa2989f48c2bf654e990470e6d9a3178';
 			$this->model->about = '{}';
@@ -35,11 +35,57 @@
 			}
 		}
 
-		function delete() {
+		public function delete() {
 			echo 'delete';
 		}
 
-		function update() {
+		public function update() {
 			echo 'update';
+		}
+		
+		public function login() {
+		
+			$this->session->startSession();
+			
+			$email = $this->post['email'];
+			$password = hash('sha256', $this->post['password']);
+			$offset = $this->get['offset'];
+			$session_hash = $this->session->getSessionId();			
+			$passwordExpireTime = ($this->get['savePassword'] === '1') ? $this->config['session']['lifeTimeMax'] : $this->config['session']['lifeTimeMin'];
+			
+			$ip_address = '';
+			
+			
+			
+			
+			
+			/*$result = $this->model->selectWithClause(
+						array('id', 'email'), 
+						array('email' => 'sabit91@mail.ru',
+							  'password' => 'e8358c9cf215cf24afbaacb0408f7cfefa2989f48c2bf654e990470e6d9a3178'),
+						$offset = 0,
+						array(),
+						'ASC'
+					);*/
+			
+			$result = $this->model->updateByClause(
+					array(
+						'session_hash' 		=> $session_hash,
+						'ip_address' 		=> $ip_address,
+						'login_expire_time'	=> date("Y-m-d H:i:s", strtotime("+$passwordExpireTime seconds"))
+					),
+					array(
+						'email' => $email,
+						'password' => $password
+					)
+				);
+		}
+		
+		public function isLoggedIn() {
+			
+		}
+		
+		public function logout() {
+		
 		}
 	}
