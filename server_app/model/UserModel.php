@@ -31,10 +31,11 @@
 				  'isFk'=>false,
 				  'dataType'=>'string',
 				  'isEmpty'=>false,				  
-				  'maxLength'=>64,
-				  'minLength'=>64,
+				  'maxLength'=>12,
+				  'minLength'=>5,
 				  'regular'=>null,
-				  'fieldValue'=>''),
+				  'fieldValue'=>'',
+				  'confirmValue'=>''),
 			array('fieldName'=>'about',
 				  'isPk'=>false,
 				  'isFk'=>array(),
@@ -104,5 +105,7 @@
 				  'minValue'=>null,				  
 				  'fieldValue'=>'')
 		);
+		
+		
 
 	}

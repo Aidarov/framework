@@ -16,31 +16,82 @@
 			echo 'index';
 		}
 
-		public function insert() {			
-			$this->model->email = 'sabit91@mail.ru';
-			$this->model->password = 'e8358c9cf215cf24afbaacb0408f7cfefa2989f48c2bf654e990470e6d9a3178';
-			$this->model->about = '{}';
-			$this->model->status = 0;
-			$this->model->user_role_code = 'super_user';
-			$this->model->registration_date = date("Y-m-d H:i:s", time());
-			$this->model->confirm_hash = 'c03f006ce118530d22ab5841b60770d9d6c6f2e67e1a6ae2847c3930c58d50f1';
-			$this->model->session_hash = 'c03f006ce118530d22ab5841b60770d9d6c6f2e67e1a6ae2847c3930c58d50f1';
-			$this->model->ip_address = '10.20.3.78';
+
+		public function insert() {
+
+			$fullname 	= $this->post['fullname'];
+			$address 	= $this->post['address'];
+			$phone 		= $this->post['phone'];
+			$gender 	= $this->post['gender'];
+			$about 		= json_encode(array('fullname' 	=> $fullname,
+											'address'	=> $address,
+											'phone'		=> $phone,
+											'gender'	=> $gender));
+
+			$email				= $this->post['email'];
+			$password			= $this->get['password'];
+			$confirm_password	= $this->get['confirm_password'];
+			$user_role 			= $this->post['user_role'];
+			$registration_date 	= date("Y-m-d H:i:s", time());
+			$confirm_hash 		= hash('sha256', $this->post['email'].time());
+			$session_hash 		= hash('sha256', $this->post['email'].time());
+			$ip_address			= null;
+
+			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			    $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			    $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			} else {
+			    $ip_address = $_SERVER['REMOTE_ADDR'];
+			}
+			
+
+			$this->model->email 			= $email;
+			$this->model->password 			= $password;
+			$this->model->about 			= $about;
+			$this->model->status 			= 0;
+			$this->model->user_role_code 	= $user_role;
+			$this->model->registration_date = $registration_date;
+			$this->model->confirm_hash 		= $confirm_hash;
+			$this->model->session_hash 		= $session_hash;
+			$this->model->ip_address 		= $ip_address;
+
 			$this->model->login_expire_time = '';
+
+			$this->model->setPasswordVerify('password', $confirm_password);
+
 			if($this->model->validate()) {
+				$this->password = hash('sha256', $password);
 				$this->model->save();
 			}
 			else {
 				print_r($this->model->getValidationErrors());
 			}
 		}
+		
+		public function update() {
+			$id 	= $this->post['id'];
+
+			$about 	= json_encode(array('fullname' 	=> $fullname,
+										'address'	=> $address,
+										'phone'		=> $phone,
+										'gender'	=> $gender));
+
+			$params = array('email' 			=> $this->post['id'],
+							'about'				=> $about,
+							'status' 			=> $this->post['status'],
+							'user_role_code'	=> $this->post['user_role']
+							);
+
+			$result = $this->updateByPk($id, $params);			
+		}
 
 		public function delete() {
 			echo 'delete';
 		}
-
-		public function update() {
-			echo 'update';
+		
+		public function isLoggedIn() {
+			
 		}
 		
 		public function login() {
@@ -79,13 +130,14 @@
 						'password' => $password
 					)
 				);
-		}
-		
-		public function isLoggedIn() {
-			
-		}
+		}		
 		
 		public function logout() {
 		
+			$id = $this->post['id'];
+			$result = $this->deleteByPk($id);			
 		}
+
+		
+		
 	}
