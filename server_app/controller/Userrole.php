@@ -8,7 +8,7 @@
 			*
 			* always call parent controller constructor
 			*/
-			parent::__construct();	
+			parent::__construct();
 			$this->model = new UserRoleModel();
 		}
 

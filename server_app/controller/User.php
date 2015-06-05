@@ -2,13 +2,18 @@
 	class User extends Controller{
 
 		private $model;	
+		
+		protected $userAccessRoleList = array(
+			'administrator',
+			'manager'
+		);
 	
 		public function __construct() {
 			/**
 			*
 			* always call parent controller constructor
 			*/
-			$this->userAccessRoleList = array('super_user');
+			//$this->userAccessRoleList = array('administrator','manager');
 			
 			parent::__construct();	
 			$this->model = new UserModel();

@@ -12,6 +12,7 @@
 		protected $post;
 		protected $get;
 		protected $userInfo;
+		protected $userAccessRoleList = array();
 		
 
 		function __construct() {
@@ -30,9 +31,7 @@
 			
 			$this->identifyUser();
 			
-			print_r($this->userAccessRoleList);
-			
-
+			$this->checkAccess();
 		}
 
 		public function view($viewName, $arguments = null, $controllerName = null) {	
@@ -50,7 +49,7 @@
 			unset($arguments);
 			unset($defaultView);
 			unset($controller);
-
+			
 			include_once($view);
 		}
 		
@@ -60,8 +59,14 @@
 			}
 		}
 		
-		private function checkAccess() {
-			
+		private function checkAccess() {			
+			if (in_array($this->getUserRole, $this->userAccessRoleList) || (sizeof($this->userAccessRoleList) === 0)) {
+				echo 1;
+			}
+			else {				
+				$this->view('forbidden', array('error' => array('result' => false, 'reason' => 'no_permission_to_page_'.strtolower(get_class($this)))), 'error');
+				exit;
+			}
 			
 		}
 		
